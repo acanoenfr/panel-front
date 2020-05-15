@@ -24,10 +24,21 @@ const router = new VueRouter({
     ]
 })
 
+// require authentication
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (store.getters.isLogged) next()
         else next('/Login')
+    } else {
+        next()
+    }
+})
+
+// require admin permissions
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAdmin)) {
+        if (store.getters.isAdmin) next()
+        else next('/')
     } else {
         next()
     }
