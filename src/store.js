@@ -10,11 +10,11 @@ export default new Vuex.Store({
         user: JSON.parse(localStorage.getItem('user')) || {}
     },
     mutations: {
-        [AUTH_LOGIN]: (state, info) => {
+        AUTH_LOGIN: (state, info) => {
             state.token = info.token
             state.user = info.user
         },
-        [AUTH_LOGOUT]: state => {
+        AUTH_LOGOUT: state => {
             state.token = ''
             state.user = {}
         }
