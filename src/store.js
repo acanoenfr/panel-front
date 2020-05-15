@@ -7,7 +7,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         token: localStorage.getItem('token') || '',
-        user: JSON.parse(localStorage.getItem('user')) || {}
+        user: JSON.parse(localStorage.getItem('user')) || {},
+        snackbar: { text: '', color: '', show: false }
     },
     mutations: {
         AUTH_LOGIN: (state, info) => {
@@ -17,21 +18,25 @@ export default new Vuex.Store({
         AUTH_LOGOUT: state => {
             state.token = ''
             state.user = {}
+        },
+        CALL_MSG: (state, info) => {
+            state.snackbar = info
         }
     },
     actions: {
-        login: ({ commit, dispatch }, username, password) => {
+        login: ({ commit, dispatch }, user) => {
             return new Promise((resolve, reject) => {
-                users.login(username, password)
+                users.login(user.username, user.password)
                     .then(info => {
-                        localStorage.setItem('token', info.token)
-                        localStorage.setItem('user', info.user)
-                        commit('AUTH_LOGIN', info)
-                        resolve(info)
-                    })
-                    .catch(err => {
-                        dispatch('logout')
-                        reject(err)
+                        if (!info.error) {
+                            localStorage.setItem('token', info.token)
+                            localStorage.setItem('user', JSON.stringify(info.user))
+                            commit('AUTH_LOGIN', info)
+                            resolve(info)
+                        } else {
+                            dispatch('logout')
+                            reject(info)
+                        }
                     })
             })
         },
@@ -44,6 +49,7 @@ export default new Vuex.Store({
     getters: {
         token: state => state.token,
         user: state => state.user,
+        snackbar: state => state.snackbar,
         isLogged: state => !!state.token,
         isAdmin: state => state.user.isAdmin
     }
