@@ -33,6 +33,36 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
+                    <v-dialog v-model="consoleDialog" max-width="900px">
+                        <v-card>
+                            <v-card-title class="headline grey darken-3 white--text">
+                                <span>Console du serveur</span>
+                                <v-spacer></v-spacer>
+                                <v-btn color="white" icon @click="closeConsoleDialog">
+                                    <v-icon>mdi-close</v-icon>
+                                </v-btn>
+                            </v-card-title>
+                                <v-container>
+                                    <v-textarea v-model="logs" id="logs" height="500px" filled no-resize readonly></v-textarea>
+                                    <v-row align="center">
+                                        <v-col cols="11">
+                                            <v-text-field v-model="command" label="Entrez une commande"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="1">
+                                            <v-btn icon>
+                                                <v-icon @click="sendCommand">mdi-send</v-icon>
+                                            </v-btn>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            <v-card-text>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn @click="closeConsoleDialog">Fermer</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                     <v-dialog v-model="confirmDialog" max-width="500px">
                         <ConfirmDialog :closeDialog="closeConfirmDialog" :saveDialog="deleteItem">
                         </ConfirmDialog>
@@ -52,7 +82,7 @@
                 <v-icon v-if="item.state === 'Démarré'" color="orange darken-1" class="mr-2" title="Arrêter le serveur" @click="stopItem(item.id)">
                     mdi-stop
                 </v-icon>
-                <v-icon class="mr-2" title="Afficher la console" @click="true">
+                <v-icon class="mr-2" title="Afficher la console" @click="showConsoleDialog(item)">
                     mdi-console
                 </v-icon>
                 <v-icon class="mr-2" title="Editer le serveur" @click="editItem(item)" :disabled="!$store.getters.isAdmin">
@@ -77,6 +107,7 @@
             return {
                 formDialog: false,
                 confirmDialog: false,
+                consoleDialog: false,
                 headers: [
                     { text: 'Etat', value: 'state', sortable: true },
                     { text: 'Nom', value: 'name', sortable: true },
@@ -84,6 +115,8 @@
                     { text: 'Chemin', value: 'path', sortable: false },
                     { text: 'Actions', value: 'actions', sortable: false },
                 ],
+                logs: '',
+                command: '',
                 servers: [],
                 editedIndex: -1,
                 editedItem: { id: 0, name: '', isProxy: false, path: '' },
@@ -118,6 +151,20 @@
                 })
                 this.servers = this.servers.filter(x => x.id !== this.editedItem.id)
                 this.closeConfirmDialog()
+            },
+            showConsoleDialog(item) {
+                actions.getServerLogs(item.id)
+                    .then(res => (this.logs = res))
+                this.editedIndex = this.servers.indexOf(item)
+                this.editedItem = Object.assign({}, item)
+                this.consoleDialog = true
+            },
+            closeConsoleDialog() {
+                this.consoleDialog = false
+                this.logs = ''
+                this.command = ''
+                this.editedItem = Object.assign({}, this.defaultItem)
+                this.editedIndex = -1
             },
             closeDialog() {
                 this.formDialog = false
@@ -166,6 +213,15 @@
                         this.getServers()
                     })
             },
+            sendCommand() {
+                actions.sendCommand(this.editedItem.id, this.command)
+                this.$store.commit('CALL_MSG', {
+                    text: 'Commande éxécutée avec succès.',
+                    color: 'info',
+                    show: true
+                })
+                this.closeConsoleDialog()
+            },
             getServers() {
                 servers.getAllServers()
                     .then(servers => {
@@ -190,6 +246,12 @@
         watch: {
             formDialog(val) {
                 val || this.closeDialog()
+            },
+            confirmDialog(val) {
+                val || this.closeConfirmDialog()
+            },
+            consoleDialog(val) {
+                val || this.closeConsoleDialog()
             }
         },
         mounted() {
