@@ -26,7 +26,7 @@
                             color: 'success',
                             show: true
                         })
-                        this.$router.push('/')
+                        this.$router.push('/Home')
                     })
                     .catch(() => {
                         this.$store.commit('CALL_MSG', {

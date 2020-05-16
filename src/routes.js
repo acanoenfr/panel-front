@@ -3,13 +3,14 @@ import VueRouter from "vue-router"
 import store from "./store"
 import Home from "./views/Home"
 import Login from "./views/Login"
+import Params from "./views/Params"
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
     routes: [
         {
-            path: '/',
+            path: '/Home',
             name: 'Home',
             component: Home,
             meta: { requiresAuth: true }
@@ -19,8 +20,14 @@ const router = new VueRouter({
             name: 'Login',
             component: Login
         },
+        {
+            path: '/Params',
+            name: 'Params',
+            component: Params,
+            meta: { requiresAuth: true }
+        },
         // otherwise, redirect to Home
-        { path: '*', redirect: '/' }
+        { path: '*', redirect: '/Home' }
     ]
 })
 
