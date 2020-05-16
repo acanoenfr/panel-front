@@ -23,7 +23,7 @@
                     mdi-stop
                 </v-icon>
                 <v-icon class="mr-2" title="Afficher la console" @click="true">
-                    mdi-eye
+                    mdi-console
                 </v-icon>
                 <v-icon class="mr-2" title="Editer le serveur" @click="true" :disabled="!$store.getters.isAdmin">
                     mdi-pencil
