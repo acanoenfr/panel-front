@@ -22,7 +22,15 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
-      <v-list-item v-for="(item, key) in items" :key="key" :to="item.path">
+      <v-list-item v-for="(item, key) in items.filter(x => !x.onlyAdmin)" :key="key" :to="item.path">
+        <v-list-item-icon>
+          <v-icon :color="$route.path === item.path ? 'primary' : ''">{{ item.icon }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item v-show="currentUser.isAdmin" v-for="(item, key) in items.filter(x => x.onlyAdmin)" :key="key" :to="item.path">
         <v-list-item-icon>
           <v-icon :color="$route.path === item.path ? 'primary' : ''">{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -45,8 +53,9 @@ export default {
   data() {
     return {
       items: [
-        { title: 'Serveurs', icon: 'mdi-server', path: '/Home' },
-        { title: 'Paramètres', icon: 'mdi-account-cog', path: '/Params' }
+        { title: 'Serveurs', icon: 'mdi-server', path: '/Home', onlyAdmin: false },
+        { title: 'Utilisateurs', icon: 'mdi-account-multiple', path: '/Users', onlyAdmin: true },
+        { title: 'Paramètres', icon: 'mdi-cogs', path: '/Params', onlyAdmin: false }
       ]
     }
   },
