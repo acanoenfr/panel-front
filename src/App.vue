@@ -45,8 +45,8 @@ export default {
   data() {
     return {
       items: [
-        { title: 'Tableau de bord', icon: 'mdi-view-dashboard-outline', path: '/Home' },
-        { title: 'Paramètres', icon: 'mdi-account-cog-outline', path: '/Params' }
+        { title: 'Serveurs', icon: 'mdi-server', path: '/Home' },
+        { title: 'Paramètres', icon: 'mdi-account-cog', path: '/Params' }
       ]
     }
   },
